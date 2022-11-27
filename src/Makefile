@@ -19,7 +19,7 @@ CFLAGS = \
 CPPFLAGS = \
 	-DKERNAUX_DEBUG
 
-OBJS = start.S.o
+OBJS = start.S.o main.c.o
 
 all: $(MRUBYVISOR)
 
