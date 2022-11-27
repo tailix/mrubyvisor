@@ -10,6 +10,7 @@
 #include <kernaux/multiboot2.h>
 
 #include <mruby.h>
+#include <mruby/presym.h>
 #include <mruby/string.h>
 
 static struct KernAux_FreeList allocator;
@@ -45,6 +46,21 @@ void main(
 
     {
         mrb_value hello = mrb_str_new_lit(mrb, "Hello, World! Ruby works!\n");
+        kernaux_drivers_console_print(RSTRING_CSTR(mrb, hello));
+    }
+
+    {
+        const char *const source =
+            "begin                                                \n"
+            "   hello = 'Hello, World'                            \n"
+            "   works = 'Ruby eval works'                         \n"
+            "   s = [hello, works].map { |s| \"#{s}!\" }.join ' ' \n"
+            "   \"#{s}\\n\"                                       \n"
+            "end                                                  \n";
+
+        mrb_value program = mrb_str_new_cstr(mrb, source);
+        mrb_value hello =
+            mrb_funcall_id(mrb, mrb_nil_value(), MRB_SYM(eval), 1, program);
         kernaux_drivers_console_print(RSTRING_CSTR(mrb, hello));
     }
 
