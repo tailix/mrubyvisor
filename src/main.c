@@ -12,9 +12,6 @@
 #include <mruby.h>
 #include <mruby/string.h>
 
-#define DEBUG(call, result) \
-    kernaux_drivers_console_printf("[%s]: %s\n", ((result) ? " OK " : "FAIL"), (call))
-
 static struct KernAux_FreeList allocator;
 static uint8_t memory[1024 * 128]; // 128 KiB
 
@@ -39,43 +36,15 @@ void main(
 
     {
         char *const hello = malloc(100);
-        DEBUG("malloc(100)", hello);
-        if (hello) {
-            strcpy(hello, "Hello, World!\n");
-            kernaux_drivers_console_print(hello);
-            free(hello);
-        }
-    }
-
-    {
-        char *const hello = realloc(NULL, 100);
-        DEBUG("realloc(NULL, 100)", hello);
-        if (hello) {
-            strcpy(hello, "Hello, World!\n");
-            kernaux_drivers_console_print(hello);
-            free(hello);
-        }
-    }
-
-    kernaux_drivers_console_printf("sizeof(mrb_state): %lu\n", sizeof(mrb_state));
-
-    {
-        mrb_state *tmp = malloc(sizeof(mrb_state));
-        DEBUG("malloc(sizeof(mrb_state))", tmp);
-        if (tmp) free(tmp);
-    }
-
-    {
-        mrb_state *tmp = realloc(NULL, sizeof(mrb_state));
-        DEBUG("realloc(NULL, sizeof(mrb_state))", tmp);
-        if (tmp) free(tmp);
+        strcpy(hello, "Hello, World! The allocator works!\n");
+        kernaux_drivers_console_print(hello);
+        free(hello);
     }
 
     mrb = mrb_open();
-    DEBUG("mrb_open()", mrb);
 
     {
-        mrb_value hello = mrb_str_new_lit(mrb, "Hello, World!\n");
+        mrb_value hello = mrb_str_new_lit(mrb, "Hello, World! Ruby works!\n");
         kernaux_drivers_console_print(RSTRING_CSTR(mrb, hello));
     }
 }
