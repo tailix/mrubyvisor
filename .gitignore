@@ -1,4 +1,7 @@
 /build_config.rb.lock
+/image.iso
 
 /dest/*
 !/dest/.keep
+
+/rootfs/boot/mrubyvisor.multiboot2
