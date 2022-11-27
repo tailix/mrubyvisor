@@ -9,8 +9,13 @@
 #include <kernaux/libc.h>
 #include <kernaux/multiboot2.h>
 
+#include <mruby.h>
+#include <mruby/string.h>
+
 static struct KernAux_FreeList allocator;
 static uint8_t memory[1024 * 64]; // 64 KiB
+
+static mrb_state *mrb = NULL;
 
 static void *my_calloc(size_t nmemb, size_t size);
 static void my_free(void *ptr);
@@ -29,10 +34,21 @@ void main(
     kernaux_libc.malloc  = my_malloc;
     kernaux_libc.realloc = my_realloc;
 
-    char *const hello = malloc(100);
-    strcpy(hello, "Hello, World!\n");
+    {
+        char *const hello = malloc(100);
+        strcpy(hello, "Hello, World!\n");
+        kernaux_drivers_console_print(hello);
+        free(hello);
+    }
 
-    kernaux_drivers_console_print(hello);
+    mrb = mrb_open();
+
+    kernaux_drivers_console_printf("mrb_open: %s\n", mrb ? "OK" : "FAIL");
+
+    {
+        mrb_value hello = mrb_str_new_lit(mrb, "Hello, World!\n");
+        kernaux_drivers_console_print(RSTRING_CSTR(mrb, hello));
+    }
 }
 
 void *my_calloc(size_t nmemb, size_t size)
