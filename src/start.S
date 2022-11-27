@@ -39,6 +39,6 @@ _start:
 
     push %ebx // Multiboot information pointer
     push %eax // Multiboot magic number
-    //call main
+    call main
 
 .size _start, . - _start

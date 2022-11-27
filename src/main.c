@@ -47,6 +47,9 @@ void main(
         mrb_value hello = mrb_str_new_lit(mrb, "Hello, World! Ruby works!\n");
         kernaux_drivers_console_print(RSTRING_CSTR(mrb, hello));
     }
+
+    // Halt
+    for (;;) kernaux_drivers_console_print("");
 }
 
 void *my_calloc(size_t nmemb, size_t size)
