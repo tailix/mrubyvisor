@@ -12,7 +12,6 @@
 
 #include <mruby.h>
 #include <mruby/compile.h>
-#include <mruby/presym.h>
 #include <mruby/proc.h>
 #include <mruby/string.h>
 
