@@ -1,11 +1,56 @@
+#include <stddef.h>
 #include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include <kernaux/drivers/console.h>
+#include <kernaux/generic/malloc.h>
+#include <kernaux/free_list.h>
+#include <kernaux/libc.h>
 #include <kernaux/multiboot2.h>
+
+static struct KernAux_FreeList allocator;
+static uint8_t memory[1024 * 64]; // 64 KiB
+
+static void *my_calloc(size_t nmemb, size_t size);
+static void my_free(void *ptr);
+static void *my_malloc(size_t size);
+static void *my_realloc(void *ptr, size_t size);
 
 void main(
     const uint32_t multiboot2_info_magic,
     const struct KernAux_Multiboot2_Info *const multiboot2_info
 ) {
-    kernaux_drivers_console_print("Hello, World!\n");
+    KernAux_FreeList_init(&allocator, NULL);
+    KernAux_FreeList_add_zone(&allocator, memory, sizeof(memory));
+
+    kernaux_libc.calloc  = my_calloc;
+    kernaux_libc.free    = my_free;
+    kernaux_libc.malloc  = my_malloc;
+    kernaux_libc.realloc = my_realloc;
+
+    char *const hello = malloc(100);
+    strcpy(hello, "Hello, World!\n");
+
+    kernaux_drivers_console_print(hello);
+}
+
+void *my_calloc(size_t nmemb, size_t size)
+{
+    return KernAux_Malloc_calloc(&allocator.malloc, nmemb, size);
+}
+
+void my_free(void *ptr)
+{
+    KernAux_Malloc_free(&allocator.malloc, ptr);
+}
+
+void *my_malloc(size_t size)
+{
+    return KernAux_Malloc_malloc(&allocator.malloc, size);
+}
+
+void *my_realloc(void *ptr, size_t size)
+{
+    return KernAux_Malloc_realloc(&allocator.malloc, ptr, size);
 }
