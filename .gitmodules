@@ -1,3 +1,6 @@
 [submodule "vendor/libkernaux"]
 	path = vendor/libkernaux
 	url = https://github.com/tailix/libkernaux.git
+[submodule "vendor/mruby"]
+	path = vendor/mruby
+	url = https://github.com/mruby/mruby.git
