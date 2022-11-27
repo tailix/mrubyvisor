@@ -1,0 +1,4 @@
+/build_config.rb.lock
+
+/dest/*
+!/dest/.keep
