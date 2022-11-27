@@ -7,6 +7,7 @@ MRuby::CrossBuild.new 'mrubyvisor' do |conf|
   conf.cc.defines   <<
     'MRB_NO_BOXING' <<
     'MRB_NO_FLOAT'  <<
+    'MRB_NO_GEMS'   <<
     'MRB_NO_STDIO'
 
   conf.cc.flags      <<

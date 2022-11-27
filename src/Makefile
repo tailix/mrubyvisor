@@ -20,6 +20,7 @@ CPPFLAGS = \
 	-DKERNAUX_DEBUG \
 	-DMRB_NO_BOXING \
 	-DMRB_NO_FLOAT  \
+	-DMRB_NO_GEMS   \
 	-DMRB_NO_STDIO
 
 OBJS = start.S.o main.c.o
