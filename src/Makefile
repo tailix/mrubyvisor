@@ -27,7 +27,7 @@ clean:
 	rm -f $(MRUBYVISOR) $(OBJS)
 
 $(MRUBYVISOR): $(OBJS)
-	$(CC) -T linker.ld -o $@ $^ -ffreestanding -nostdlib -lkernaux -lmruby -lgcc -Wl,-L$(DEST)/lib
+	$(CC) -T linker.ld -o $@ $^ -ffreestanding -nostdlib -lmruby -lkernaux -lc -lgcc -Wl,-L$(DEST)/lib
 	grub-file --is-x86-multiboot2 $@
 
 %.c.o: %.c

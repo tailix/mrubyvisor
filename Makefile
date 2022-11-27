@@ -45,7 +45,7 @@ $(MRUBYVISOR): $(LIBKERNAUX) $(LIBMRUBY)
 
 $(LIBKERNAUX):
 	cd vendor/libkernaux && ./autogen.sh
-	cd vendor/libkernaux && ./configure --host='i386-elf' --prefix='$(ABS_REPO)/$(DEST)' --enable-freestanding --with-drivers --with-libc AR='$(AR)' AS='$(AS)' CC='$(CC)' LD='$(LD)' RANLIB='$(RANLIB)'
+	cd vendor/libkernaux && ./configure --host='i386-elf' --prefix='$(ABS_REPO)/$(DEST)' --enable-freestanding --enable-split-libc --with-drivers --with-libc AR='$(AR)' AS='$(AS)' CC='$(CC)' LD='$(LD)' RANLIB='$(RANLIB)'
 	cd vendor/libkernaux && $(MAKE)
 	cd vendor/libkernaux && $(MAKE) install
 
