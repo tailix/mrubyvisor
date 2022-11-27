@@ -1,0 +1,3 @@
+[submodule "vendor/libkernaux"]
+	path = vendor/libkernaux
+	url = https://github.com/tailix/libkernaux.git
