@@ -4,6 +4,8 @@ DEST_DIR = File.join(ROOT_DIR, 'dest').freeze
 MRuby::CrossBuild.new 'mrubyvisor' do |conf|
   conf.toolchain :gcc
 
+  conf.gem core: 'mruby-compiler'
+
   conf.cc.defines   <<
     'MRB_NO_BOXING' <<
     'MRB_NO_FLOAT'  <<
