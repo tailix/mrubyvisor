@@ -1,15 +1,7 @@
-ROOT_DIR = File.expand_path(__dir__).freeze
-DEST_DIR = File.join(ROOT_DIR, 'dest').freeze
-
-MRuby::CrossBuild.new 'mrubyvisor' do |conf|
+MRuby::CrossBuild.new ENV.fetch 'BUILD_NAME' do |conf|
   conf.toolchain :gcc
 
   conf.gem core: 'mruby-compiler'
-
-  conf.cc.defines   <<
-    'MRB_NO_BOXING' <<
-    'MRB_NO_FLOAT'  <<
-    'MRB_NO_STDIO'
 
   conf.cc.flags      <<
     '-Wall'          <<
@@ -19,10 +11,15 @@ MRuby::CrossBuild.new 'mrubyvisor' do |conf|
     '-fno-pic'       <<
     '-fno-stack-protector'
 
-  conf.cc.include_paths <<     File.join(DEST_DIR, 'include')
-  conf.linker.library_paths << File.join(DEST_DIR, 'lib')
+  ENV.fetch('FLAGS').split.map do |flag|
+    m = /\A-D(MRB_.*)\z/.match flag
+    conf.cc.defines << m[1] if m
+  end
 
-  conf.archiver.command = ENV['CROSS_AR']
-  conf.cc.command       = ENV['CROSS_CC']
-  conf.linker.command   = ENV['CROSS_LD']
+  conf.cc.include_paths     << ENV.fetch('INCLUDE_DIR')
+  conf.linker.library_paths << ENV.fetch('LIB_DIR')
+
+  conf.archiver.command = ENV.fetch 'CROSS_AR'
+  conf.cc.command       = ENV.fetch 'CROSS_CC'
+  conf.linker.command   = ENV.fetch 'CROSS_LD'
 end

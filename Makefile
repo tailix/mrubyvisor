@@ -29,7 +29,12 @@ LIBKERNAUX_ARGS =       \
 	--with-drivers        \
 	--with-libc
 
-MRUBY_NAME = mrubyvisor
+MRUBY_FLAGS =     \
+	-DMRB_NO_BOXING \
+	-DMRB_NO_FLOAT  \
+	-DMRB_NO_STDIO
+
+MRUBY_BUILD_NAME = mrubyvisor
 
 .PHONY: $(IMAGE) $(MRUBYVISOR)
 
@@ -59,7 +64,7 @@ $(IMAGE): $(GRUBCFG) $(MRUBYVISOR)
 	grub-mkrescue $(ROOTFS) -o $@
 
 $(MRUBYVISOR): $(LIBKERNAUX) $(LIBMRUBY)
-	$(MAKE) -C $(SRC) mrubyvisor.multiboot2 CCPREFIX='$(CCPREFIX)' DEST='$(ABS_REPO)/$(DEST)'
+	$(MAKE) -C $(SRC) mrubyvisor.multiboot2 CCPREFIX='$(CCPREFIX)' DEST='$(ABS_REPO)/$(DEST)' MRUBY_FLAGS='$(MRUBY_FLAGS)'
 	cp $(SRC)/mrubyvisor.multiboot2 $@
 
 $(LIBKERNAUX):
@@ -70,8 +75,8 @@ $(LIBKERNAUX):
 
 $(LIBMRUBY): $(LIBKERNAUX) $(MRUBY_CONF)
 	$(MAKE) clean-mruby
-	cd vendor/mruby && $(RAKE) MRUBY_CONFIG='$(ABS_REPO)/$(MRUBY_CONF)' CROSS_AR='$(AR)' CROSS_CC='$(CC)' CROSS_LD='$(LD)'
+	cd vendor/mruby && $(RAKE) MRUBY_CONFIG='$(ABS_REPO)/$(MRUBY_CONF)' CROSS_AR='$(AR)' CROSS_CC='$(CC)' CROSS_LD='$(LD)' FLAGS='$(MRUBY_FLAGS)' BUILD_NAME='$(MRUBY_BUILD_NAME)' INCLUDE_DIR='$(ABS_REPO)/$(DEST)/include' LIB_DIR='$(ABS_REPO)/$(DEST)/lib'
 	mkdir -p $(DEST)/include $(DEST)/lib
-	cp vendor/mruby/build/$(MRUBY_NAME)/lib/libmruby.a $(DEST)/lib
+	cp vendor/mruby/build/$(MRUBY_BUILD_NAME)/lib/libmruby.a $(DEST)/lib
 	cp -r vendor/mruby/include/* $(DEST)/include
-	cp -r vendor/mruby/build/$(MRUBY_NAME)/include/* $(DEST)/include
+	cp -r vendor/mruby/build/$(MRUBY_BUILD_NAME)/include/* $(DEST)/include
