@@ -2,6 +2,7 @@ MRuby::CrossBuild.new ENV.fetch 'BUILD_NAME' do |conf|
   conf.toolchain :gcc
 
   conf.gem core: 'mruby-compiler'
+  conf.gem core: 'mruby-enumerator'
 
   conf.cc.flags      <<
     '-Wall'          <<
