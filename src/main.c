@@ -23,7 +23,6 @@ static uint8_t memory[1024 * 128]; // 128 KiB
 
 static mrb_state *mrb = NULL;
 
-static void panic(const char *str);
 static void assert(const char *file, int line, const char *str);
 
 static void *my_calloc(size_t nmemb, size_t size);
