@@ -15,7 +15,7 @@
 #include <mruby/presym.h>
 #include <mruby/string.h>
 
-#define PANIC(msg) (assert_cb(__FILE__, __LINE__, msg))
+#define PANIC(msg) (assert(__FILE__, __LINE__, msg))
 #define ASSERT(cond) ((cond) ? (void)0 : PANIC(#cond))
 
 static struct KernAux_FreeList allocator;
@@ -24,7 +24,7 @@ static uint8_t memory[1024 * 128]; // 128 KiB
 static mrb_state *mrb = NULL;
 
 static void panic(const char *str);
-static void assert_cb(const char *file, int line, const char *str);
+static void assert(const char *file, int line, const char *str);
 
 static void *my_calloc(size_t nmemb, size_t size);
 static void my_free(void *ptr);
@@ -35,7 +35,7 @@ void main(
     const uint32_t multiboot2_info_magic,
     const struct KernAux_Multiboot2_Info *const multiboot2_info
 ) {
-    kernaux_assert_cb = assert_cb;
+    kernaux_assert_cb = assert;
 
     KernAux_FreeList_init(&allocator, NULL);
     KernAux_FreeList_add_zone(&allocator, memory, sizeof(memory));
@@ -114,7 +114,7 @@ void main(
     }
 }
 
-void assert_cb(const char *const file, const int line, const char *const str)
+void assert(const char *const file, const int line, const char *const str)
 {
     kernaux_drivers_console_printf("panic: %s:%u: \"%s\"\n", file, line, str);
     kernaux_drivers_shutdown_poweroff();
