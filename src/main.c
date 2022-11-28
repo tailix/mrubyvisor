@@ -1,3 +1,4 @@
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -12,7 +13,9 @@
 #include <kernaux/multiboot2.h>
 
 #include <mruby.h>
+#include <mruby/compile.h>
 #include <mruby/presym.h>
+#include <mruby/proc.h>
 #include <mruby/string.h>
 
 #define PANIC(msg) (assert(__FILE__, __LINE__, msg))
@@ -22,6 +25,7 @@ static struct KernAux_FreeList allocator;
 static uint8_t memory[1024 * 128]; // 128 KiB
 
 static mrb_state *mrb = NULL;
+static mrbc_context *context = NULL;
 
 static void assert(const char *file, int line, const char *str);
 
@@ -73,6 +77,8 @@ void main(
         kernaux_drivers_console_print(RSTRING_CSTR(mrb, hello));
     }
 
+    ASSERT(context = mrbc_context_new(mrb));
+
     {
         const char *cmdline = "";
 
@@ -110,6 +116,20 @@ void main(
         kernaux_drivers_console_print("----------------------------------------\n");
         kernaux_drivers_console_write(source, size);
         if (source[size - 1] != '\n') kernaux_drivers_console_putc('\n');
+
+        const int arena = mrb_gc_arena_save(mrb);
+
+        __attribute__((unused))
+        const bool status = !mrb_undef_p(
+            mrb_load_nstring_cxt(mrb, source, size, context)
+        );
+
+        struct REnv *const env = mrb_vm_ci_env(mrb->c->cibase);
+        mrb_vm_ci_env_set(mrb->c->cibase, NULL);
+        mrb_env_unshare(mrb, env, FALSE);
+        mrbc_cleanup_local_variables(mrb, context);
+
+        mrb_gc_arena_restore(mrb, arena);
     }
 }
 
