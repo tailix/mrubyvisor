@@ -24,6 +24,8 @@ MRUBYVISOR = $(ROOTFS)/boot/mrubyvisor.multiboot2
 LIBKERNAUX_ARGS =       \
 	--enable-freestanding \
 	--enable-split-libc   \
+	--enable-debug        \
+	--disable-float       \
 	--with-drivers        \
 	--with-libc
 
