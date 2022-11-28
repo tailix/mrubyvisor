@@ -15,7 +15,7 @@
 #include <mruby/presym.h>
 #include <mruby/string.h>
 
-#define PANIC(msg) (kernaux_assert_do(__FILE__, __LINE__, msg))
+#define PANIC(msg) (assert_cb(__FILE__, __LINE__, msg))
 #define ASSERT(cond) ((cond) ? (void)0 : PANIC(#cond))
 
 static struct KernAux_FreeList allocator;
