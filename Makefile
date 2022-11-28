@@ -33,10 +33,19 @@ runc: $(IMAGE)
 runw: $(IMAGE)
 	$(QEMU) -cdrom $< -serial stdio
 
-clean:
-	rm -rf $(MRUBYVISOR) $(DEST)/*
-	cd vendor/mruby && $(RAKE) clean
+clean: clean-src clean-dest clean-mruby clean-libkernaux
+
+clean-src:
 	$(MAKE) -C $(SRC) clean
+
+clean-dest:
+	rm -rf $(MRUBYVISOR) $(DEST)/*
+
+clean-mruby:
+	cd vendor/mruby && $(RAKE) clean
+
+clean-libkernaux:
+	$(MAKE) -C vendor/libkernaux distclean
 
 $(IMAGE): $(GRUBCFG) $(MRUBYVISOR)
 	grub-mkrescue $(ROOTFS) -o $@
