@@ -34,6 +34,8 @@ static void *my_realloc(void *ptr, size_t size);
 
 static bool load_module(const char *source, size_t size, const char *cmdline);
 
+static mrb_value ruby_console_puts(mrb_state *mrb, mrb_value self);
+
 void main(
     const uint32_t multiboot2_info_magic,
     const struct KernAux_Multiboot2_Info *const multiboot2_info
@@ -52,6 +54,15 @@ void main(
 
     ASSERT(mrb = mrb_open());
     ASSERT(context = mrbc_context_new(mrb));
+
+    // Define method Kernel#console_puts
+    mrb_define_method(
+        mrb,
+        mrb->kernel_module,
+        "console_puts",
+        ruby_console_puts,
+        MRB_ARGS_REQ(1)
+    );
 
     for (
         const struct KernAux_Multiboot2_ITag_Module *module_tag =
@@ -124,4 +135,14 @@ bool load_module(
     mrbc_cleanup_local_variables(mrb, context);
     mrb_gc_arena_restore(mrb, arena);
     return status;
+}
+
+mrb_value ruby_console_puts(
+    mrb_state *const mrb,
+    mrb_value self __attribute__((unused))
+) {
+    const char *str = NULL;
+    mrb_get_args(mrb, "z", &str);
+    kernaux_drivers_console_puts(str);
+    return mrb_nil_value();
 }
