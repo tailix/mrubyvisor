@@ -27,6 +27,11 @@ static mrbc_context *context = NULL;
 
 static void assert(const char *file, int line, const char *str);
 
+__attribute__((noreturn))
+static void my_abort();
+__attribute__((noreturn))
+static void my_exit(int status);
+
 static void *my_calloc(size_t nmemb, size_t size);
 static void my_free(void *ptr);
 static void *my_malloc(size_t size);
@@ -48,6 +53,9 @@ void main(
 
     KernAux_FreeList_init(&allocator, NULL);
     KernAux_FreeList_add_zone(&allocator, memory, sizeof(memory));
+
+    kernaux_libc.abort   = my_abort;
+    kernaux_libc.exit    = my_exit;
 
     kernaux_libc.calloc  = my_calloc;
     kernaux_libc.free    = my_free;
@@ -94,6 +102,17 @@ void main(
 void assert(const char *const file, const int line, const char *const str)
 {
     kernaux_drivers_console_printf("panic: %s:%u: \"%s\"\n", file, line, str);
+    kernaux_drivers_shutdown_poweroff();
+}
+
+void my_abort()
+{
+    PANIC("abort");
+}
+
+void my_exit(const int status)
+{
+    kernaux_drivers_console_printf("exit: %d\n", status);
     kernaux_drivers_shutdown_poweroff();
 }
 
