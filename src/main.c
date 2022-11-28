@@ -65,16 +65,17 @@ void main(
     }
 
     {
+        const char *cmdline = "";
+
         const struct KernAux_Multiboot2_ITag_BootCmdLine *const cmdline_tag =
             KernAux_Multiboot2_Info_first_tag_with_type(
                 multiboot2_info,
                 KERNAUX_MULTIBOOT2_ITAG_BOOT_CMD_LINE
             );
 
-        if (cmdline_tag) {
-            const char *const cmdline = KERNAUX_MULTIBOOT2_DATA(cmdline_tag);
-            kernaux_drivers_console_printf("cmdline: %s\n", cmdline);
-        }
+        if (cmdline_tag) cmdline = KERNAUX_MULTIBOOT2_DATA(cmdline_tag);
+
+        kernaux_drivers_console_printf("cmdline: %s\n", cmdline);
     }
 
     for (
