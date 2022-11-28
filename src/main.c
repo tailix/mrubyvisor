@@ -15,11 +15,15 @@
 #include <mruby/presym.h>
 #include <mruby/string.h>
 
+#define PANIC(msg) (kernaux_assert_do(__FILE__, __LINE__, msg))
+#define ASSERT(cond) ((cond) ? (void)0 : PANIC(#cond))
+
 static struct KernAux_FreeList allocator;
 static uint8_t memory[1024 * 128]; // 128 KiB
 
 static mrb_state *mrb = NULL;
 
+static void panic(const char *str);
 static void assert_cb(const char *file, int line, const char *str);
 
 static void *my_calloc(size_t nmemb, size_t size);
@@ -48,7 +52,7 @@ void main(
         free(hello);
     }
 
-    if (!(mrb = mrb_open())) KERNAUX_PANIC("mrb_open");
+    ASSERT(mrb = mrb_open());
 
     {
         mrb_value hello = mrb_str_new_lit(mrb, "Hello, World! Ruby works!\n");
