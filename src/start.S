@@ -40,5 +40,6 @@ _start:
     push %ebx // Multiboot information pointer
     push %eax // Multiboot magic number
     call main
+    call kernaux_drivers_shutdown_poweroff
 
 .size _start, . - _start

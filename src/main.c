@@ -63,9 +63,6 @@ void main(
             mrb_funcall_id(mrb, mrb_nil_value(), MRB_SYM(eval), 1, program);
         kernaux_drivers_console_print(RSTRING_CSTR(mrb, hello));
     }
-
-    // Halt
-    for (;;) kernaux_drivers_console_print("");
 }
 
 void *my_calloc(size_t nmemb, size_t size)
