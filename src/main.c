@@ -34,6 +34,8 @@ static void my_free(void *ptr);
 static void *my_malloc(size_t size);
 static void *my_realloc(void *ptr, size_t size);
 
+static bool load_module(const char *source, size_t size, const char *cmdline);
+
 void main(
     const uint32_t multiboot2_info_magic,
     const struct KernAux_Multiboot2_Info *const multiboot2_info
@@ -110,26 +112,7 @@ void main(
         const char *const cmdline = KERNAUX_MULTIBOOT2_DATA(module_tag);
         const char *const source = module_tag->mod_start;
         const size_t size = module_tag->mod_end - module_tag->mod_start;
-
-        kernaux_drivers_console_print("========================================\n");
-        kernaux_drivers_console_printf("module cmdline: %s\n", cmdline);
-        kernaux_drivers_console_print("----------------------------------------\n");
-        kernaux_drivers_console_write(source, size);
-        if (source[size - 1] != '\n') kernaux_drivers_console_putc('\n');
-
-        const int arena = mrb_gc_arena_save(mrb);
-
-        __attribute__((unused))
-        const bool status = !mrb_undef_p(
-            mrb_load_nstring_cxt(mrb, source, size, context)
-        );
-
-        struct REnv *const env = mrb_vm_ci_env(mrb->c->cibase);
-        mrb_vm_ci_env_set(mrb->c->cibase, NULL);
-        mrb_env_unshare(mrb, env, FALSE);
-        mrbc_cleanup_local_variables(mrb, context);
-
-        mrb_gc_arena_restore(mrb, arena);
+        load_module(source, size, cmdline);
     }
 }
 
@@ -157,4 +140,26 @@ void *my_malloc(size_t size)
 void *my_realloc(void *ptr, size_t size)
 {
     return KernAux_Malloc_realloc(&allocator.malloc, ptr, size);
+}
+
+bool load_module(
+    const char *const source,
+    const size_t size,
+    const char *const cmdline
+) {
+    kernaux_drivers_console_print("========================================\n");
+    kernaux_drivers_console_printf("module cmdline: %s\n", cmdline);
+    kernaux_drivers_console_print("----------------------------------------\n");
+    kernaux_drivers_console_write(source, size);
+    if (source[size - 1] != '\n') kernaux_drivers_console_putc('\n');
+
+    const int arena = mrb_gc_arena_save(mrb);
+    const bool status =
+        !mrb_undef_p(mrb_load_nstring_cxt(mrb, source, size, context));
+    struct REnv *const env = mrb_vm_ci_env(mrb->c->cibase);
+    mrb_vm_ci_env_set(mrb->c->cibase, NULL);
+    mrb_env_unshare(mrb, env, FALSE);
+    mrbc_cleanup_local_variables(mrb, context);
+    mrb_gc_arena_restore(mrb, arena);
+    return status;
 }
