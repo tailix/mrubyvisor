@@ -118,7 +118,7 @@ void *my_realloc(void *ptr, size_t size)
 bool load_module(
     const char *const source,
     const size_t size,
-    const char *const cmdline
+    const char *const cmdline __attribute__((unused))
 ) {
     const int arena = mrb_gc_arena_save(mrb);
     const bool status =
