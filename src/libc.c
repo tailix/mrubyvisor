@@ -52,39 +52,20 @@ void my_exit(const int status)
 
 void *my_calloc(size_t nmemb, size_t size)
 {
-    void *const result = KernAux_Malloc_calloc(&allocator.malloc, nmemb, size);
-    if (result) {
-        kernaux_drivers_console_printf("calloc(%lu, %lu) = %p\n", nmemb, size, result);
-    } else if (nmemb * size != 0) {
-        kernaux_drivers_console_printf("!calloc(%lu, %lu)\n", nmemb, size);
-    }
-    return result;
+    return KernAux_Malloc_calloc(&allocator.malloc, nmemb, size);
 }
 
 void my_free(void *ptr)
 {
-    kernaux_drivers_console_printf("free(%p)\n", ptr);
     KernAux_Malloc_free(&allocator.malloc, ptr);
 }
 
 void *my_malloc(size_t size)
 {
-    void *const result = KernAux_Malloc_malloc(&allocator.malloc, size);
-    if (result) {
-        kernaux_drivers_console_printf("malloc(%lu) = %p\n", size, result);
-    } else if (size != 0) {
-        kernaux_drivers_console_printf("!malloc(%lu)\n", size);
-    }
-    return result;
+    return KernAux_Malloc_malloc(&allocator.malloc, size);
 }
 
 void *my_realloc(void *ptr, size_t size)
 {
-    void *const result = KernAux_Malloc_realloc(&allocator.malloc, ptr, size);
-    if (result) {
-        kernaux_drivers_console_printf("realloc(%p, %lu) = %p\n", ptr, size, result);
-    } else if (size != 0) {
-        kernaux_drivers_console_printf("!realloc(%p, %lu)\n", ptr, size);
-    }
-    return result;
+    return KernAux_Malloc_realloc(&allocator.malloc, ptr, size);
 }

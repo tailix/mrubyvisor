@@ -31,8 +31,6 @@ void main(
     const uint32_t multiboot2_info_magic,
     const struct KernAux_Multiboot2_Info *const multiboot2_info
 ) {
-    kernaux_drivers_console_puts("========================================");
-
     kernaux_assert_cb = assert;
 
     ASSERT(multiboot2_info_magic == KERNAUX_MULTIBOOT2_INFO_MAGIC);
