@@ -109,9 +109,9 @@ bool load_module(
     const size_t size,
     const char *const cmdline
 ) {
-    kernaux_drivers_console_print("========================================\n");
+    kernaux_drivers_console_puts("========================================");
     kernaux_drivers_console_printf("module cmdline: %s\n", cmdline);
-    kernaux_drivers_console_print("----------------------------------------\n");
+    kernaux_drivers_console_puts("----------------------------------------");
     kernaux_drivers_console_write(source, size);
     if (source[size - 1] != '\n') kernaux_drivers_console_putc('\n');
 
