@@ -1,4 +1,5 @@
 #include "libc.h"
+#include "logger.h"
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -76,7 +77,7 @@ void main(
 
 void assert(const char *const file, const int line, const char *const str)
 {
-    kernaux_drivers_console_printf("panic: %s:%u: \"%s\"\n", file, line, str);
+    logger_assert(file, line, str);
     kernaux_drivers_shutdown_poweroff();
 }
 

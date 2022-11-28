@@ -1,4 +1,5 @@
 #include "libc.h"
+#include "logger.h"
 
 #include <stdlib.h>
 
@@ -42,7 +43,7 @@ void my_abort()
 
 void my_exit(const int status)
 {
-    kernaux_drivers_console_printf("exit: %d\n", status);
+    logger_exit(status);
     kernaux_drivers_shutdown_poweroff();
 
     // TODO: libkernaux shutdown poweroff noreturn
