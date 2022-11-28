@@ -3,7 +3,6 @@
 
 #include <stdlib.h>
 
-#include <kernaux/drivers/console.h>
 #include <kernaux/drivers/shutdown.h>
 #include <kernaux/generic/malloc.h>
 #include <kernaux/free_list.h>
