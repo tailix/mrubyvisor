@@ -35,6 +35,7 @@ runw: $(IMAGE)
 
 clean:
 	rm -rf $(MRUBYVISOR) $(DEST)/*
+	cd vendor/mruby && $(RAKE) clean
 	$(MAKE) -C $(SRC) clean
 
 $(IMAGE): $(GRUBCFG) $(MRUBYVISOR)
@@ -51,6 +52,7 @@ $(LIBKERNAUX):
 	cd vendor/libkernaux && $(MAKE) install
 
 $(LIBMRUBY): $(LIBKERNAUX) $(MRUBY_CONF)
+	cd vendor/mruby && $(RAKE) clean
 	cd vendor/mruby && $(RAKE) MRUBY_CONFIG='$(ABS_REPO)/$(MRUBY_CONF)' CROSS_AR='$(AR)' CROSS_CC='$(CC)' CROSS_LD='$(LD)'
 	mkdir -p $(DEST)/include $(DEST)/lib
 	cp vendor/mruby/build/$(MRUBY_NAME)/lib/libmruby.a $(DEST)/lib
