@@ -3,7 +3,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <kernaux/assert.h>
 #include <kernaux/drivers/console.h>
+#include <kernaux/drivers/shutdown.h>
 #include <kernaux/generic/malloc.h>
 #include <kernaux/free_list.h>
 #include <kernaux/libc.h>
@@ -18,6 +20,8 @@ static uint8_t memory[1024 * 128]; // 128 KiB
 
 static mrb_state *mrb = NULL;
 
+static void assert_cb(const char *file, int line, const char *str);
+
 static void *my_calloc(size_t nmemb, size_t size);
 static void my_free(void *ptr);
 static void *my_malloc(size_t size);
@@ -27,6 +31,8 @@ void main(
     const uint32_t multiboot2_info_magic,
     const struct KernAux_Multiboot2_Info *const multiboot2_info
 ) {
+    kernaux_assert_cb = assert_cb;
+
     KernAux_FreeList_init(&allocator, NULL);
     KernAux_FreeList_add_zone(&allocator, memory, sizeof(memory));
 
@@ -42,7 +48,7 @@ void main(
         free(hello);
     }
 
-    mrb = mrb_open();
+    if (!(mrb = mrb_open())) KERNAUX_PANIC("mrb_open");
 
     {
         mrb_value hello = mrb_str_new_lit(mrb, "Hello, World! Ruby works!\n");
@@ -102,6 +108,12 @@ void main(
         kernaux_drivers_console_write(source, size);
         if (source[size - 1] != '\n') kernaux_drivers_console_putc('\n');
     }
+}
+
+void assert_cb(const char *const file, const int line, const char *const str)
+{
+    kernaux_drivers_console_printf("panic: %s:%u: \"%s\"\n", file, line, str);
+    kernaux_drivers_shutdown_poweroff();
 }
 
 void *my_calloc(size_t nmemb, size_t size)
