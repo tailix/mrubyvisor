@@ -97,15 +97,9 @@ void main(
 
         kernaux_drivers_console_print("========================================\n");
         kernaux_drivers_console_printf("module cmdline: %s\n", cmdline);
-        char *const content = malloc(size + 1);
-        if (content) {
-            memset(content, 0, size + 1);
-            memcpy(content, source, size);
-            kernaux_drivers_console_print("----------------------------------------\n");
-            kernaux_drivers_console_print(content);
-            if (content[size - 1] != '\n') kernaux_drivers_console_putc('\n');
-            free(content);
-        }
+        kernaux_drivers_console_print("----------------------------------------\n");
+        kernaux_drivers_console_write(source, size);
+        if (source[size - 1] != '\n') kernaux_drivers_console_putc('\n');
     }
 }
 
