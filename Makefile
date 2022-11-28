@@ -10,10 +10,11 @@ QEMU   = qemu-system-i386
 
 ABS_REPO = $(shell pwd)
 
-IMAGE  = image.iso
-ROOTFS = rootfs
-DEST   = dest
-SRC    = src
+DEST       = dest
+IMAGE      = image.iso
+MRUBY_CONF = build_config.rb
+ROOTFS     = rootfs
+SRC        = src
 
 GRUBCFG    = $(ROOTFS)/boot/grub/grub.cfg
 LIBKERNAUX = $(DEST)/lib/libkernaux.a
@@ -49,8 +50,8 @@ $(LIBKERNAUX):
 	cd vendor/libkernaux && $(MAKE)
 	cd vendor/libkernaux && $(MAKE) install
 
-$(LIBMRUBY): $(LIBKERNAUX)
-	cd vendor/mruby && $(RAKE) MRUBY_CONFIG='$(ABS_REPO)/build_config.rb' CROSS_AR='$(AR)' CROSS_CC='$(CC)' CROSS_LD='$(LD)'
+$(LIBMRUBY): $(LIBKERNAUX) $(MRUBY_CONF)
+	cd vendor/mruby && $(RAKE) MRUBY_CONFIG='$(ABS_REPO)/$(MRUBY_CONF)' CROSS_AR='$(AR)' CROSS_CC='$(CC)' CROSS_LD='$(LD)'
 	mkdir -p $(DEST)/include $(DEST)/lib
 	cp vendor/mruby/build/$(MRUBY_NAME)/lib/libmruby.a $(DEST)/lib
 	cp -r vendor/mruby/include/* $(DEST)/include
