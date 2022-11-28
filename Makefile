@@ -21,6 +21,12 @@ LIBKERNAUX = $(DEST)/lib/libkernaux.a
 LIBMRUBY   = $(DEST)/lib/libmruby.a
 MRUBYVISOR = $(ROOTFS)/boot/mrubyvisor.multiboot2
 
+LIBKERNAUX_ARGS =       \
+	--enable-freestanding \
+	--enable-split-libc   \
+	--with-drivers        \
+	--with-libc
+
 MRUBY_NAME = mrubyvisor
 
 .PHONY: $(IMAGE) $(MRUBYVISOR)
@@ -45,7 +51,7 @@ clean-mruby:
 	cd vendor/mruby && $(RAKE) clean
 
 clean-libkernaux:
-	$(MAKE) -C vendor/libkernaux distclean
+	$(MAKE) -C vendor/libkernaux distclean || true
 
 $(IMAGE): $(GRUBCFG) $(MRUBYVISOR)
 	grub-mkrescue $(ROOTFS) -o $@
@@ -56,7 +62,7 @@ $(MRUBYVISOR): $(LIBKERNAUX) $(LIBMRUBY)
 
 $(LIBKERNAUX):
 	cd vendor/libkernaux && ./autogen.sh
-	cd vendor/libkernaux && ./configure --host='i386-elf' --prefix='$(ABS_REPO)/$(DEST)' --enable-freestanding --enable-split-libc --with-drivers --with-libc AR='$(AR)' AS='$(AS)' CC='$(CC)' LD='$(LD)' RANLIB='$(RANLIB)'
+	cd vendor/libkernaux && ./configure --host='i386-elf' --prefix='$(ABS_REPO)/$(DEST)' $(LIBKERNAUX_ARGS) AR='$(AR)' AS='$(AS)' CC='$(CC)' LD='$(LD)' RANLIB='$(RANLIB)'
 	cd vendor/libkernaux && $(MAKE)
 	cd vendor/libkernaux && $(MAKE) install
 
