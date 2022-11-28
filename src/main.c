@@ -40,6 +40,8 @@ void main(
 ) {
     kernaux_assert_cb = assert;
 
+    ASSERT(multiboot2_info_magic == KERNAUX_MULTIBOOT2_INFO_MAGIC);
+
     KernAux_FreeList_init(&allocator, NULL);
     KernAux_FreeList_add_zone(&allocator, memory, sizeof(memory));
 
@@ -53,20 +55,24 @@ void main(
 
     for (
         const struct KernAux_Multiboot2_ITag_Module *module_tag =
+            (const struct KernAux_Multiboot2_ITag_Module*)
             KernAux_Multiboot2_Info_first_tag_with_type(
                 multiboot2_info,
                 KERNAUX_MULTIBOOT2_ITAG_MODULE
             );
         module_tag;
         module_tag =
+            (const struct KernAux_Multiboot2_ITag_Module*)
             KernAux_Multiboot2_Info_tag_with_type_after(
                 multiboot2_info,
                 KERNAUX_MULTIBOOT2_ITAG_MODULE,
-                module_tag
+                (struct KernAux_Multiboot2_ITagBase*)module_tag
             )
     ) {
-        const char *const cmdline = KERNAUX_MULTIBOOT2_DATA(module_tag);
-        const char *const source = module_tag->mod_start;
+        const char *const cmdline =
+            (const char*)KERNAUX_MULTIBOOT2_DATA(module_tag);
+        const char *const source =
+            (const char*)module_tag->mod_start;
         const size_t size = module_tag->mod_end - module_tag->mod_start;
         load_module(source, size, cmdline);
     }
