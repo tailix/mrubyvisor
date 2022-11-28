@@ -1,1 +1,4 @@
-console_puts 'Hello, World! Ruby modules work!'
+hello = 'Hello, World!'
+works = 'Ruby modules work!'
+s = [hello, works].join ' '
+console_puts s
