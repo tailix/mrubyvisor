@@ -63,6 +63,50 @@ void main(
             mrb_funcall_id(mrb, mrb_nil_value(), MRB_SYM(eval), 1, program);
         kernaux_drivers_console_print(RSTRING_CSTR(mrb, hello));
     }
+
+    {
+        const struct KernAux_Multiboot2_ITag_BootCmdLine *const cmdline_tag =
+            KernAux_Multiboot2_Info_first_tag_with_type(
+                multiboot2_info,
+                KERNAUX_MULTIBOOT2_ITAG_BOOT_CMD_LINE
+            );
+
+        if (cmdline_tag) {
+            const char *const cmdline = KERNAUX_MULTIBOOT2_DATA(cmdline_tag);
+            kernaux_drivers_console_printf("cmdline: %s\n", cmdline);
+        }
+    }
+
+    for (
+        const struct KernAux_Multiboot2_ITag_Module *module_tag =
+            KernAux_Multiboot2_Info_first_tag_with_type(
+                multiboot2_info,
+                KERNAUX_MULTIBOOT2_ITAG_MODULE
+            );
+        module_tag;
+        module_tag =
+            KernAux_Multiboot2_Info_tag_with_type_after(
+                multiboot2_info,
+                KERNAUX_MULTIBOOT2_ITAG_MODULE,
+                module_tag
+            )
+    ) {
+        const char *const cmdline = KERNAUX_MULTIBOOT2_DATA(module_tag);
+        const char *const source = module_tag->mod_start;
+        const size_t size = module_tag->mod_end - module_tag->mod_start;
+
+        kernaux_drivers_console_print("========================================\n");
+        kernaux_drivers_console_printf("module cmdline: %s\n", cmdline);
+        char *const content = malloc(size + 1);
+        if (content) {
+            memset(content, 0, size + 1);
+            memcpy(content, source, size);
+            kernaux_drivers_console_print("----------------------------------------\n");
+            kernaux_drivers_console_print(content);
+            if (content[size - 1] != '\n') kernaux_drivers_console_putc('\n');
+            free(content);
+        }
+    }
 }
 
 void *my_calloc(size_t nmemb, size_t size)
