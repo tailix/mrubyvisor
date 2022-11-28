@@ -2,6 +2,8 @@
 
 #include <stdlib.h>
 
+#include <kernaux/drivers/console.h>
+#include <kernaux/drivers/shutdown.h>
 #include <kernaux/generic/malloc.h>
 #include <kernaux/free_list.h>
 #include <kernaux/libc.h>
@@ -42,6 +44,10 @@ void my_exit(const int status)
 {
     kernaux_drivers_console_printf("exit: %d\n", status);
     kernaux_drivers_shutdown_poweroff();
+
+    // TODO: libkernaux shutdown poweroff noreturn
+    volatile int x = 0;
+    for (;;) ++x;
 }
 
 void *my_calloc(size_t nmemb, size_t size)
