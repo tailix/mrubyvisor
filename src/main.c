@@ -1,8 +1,6 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <stdlib.h>
-#include <string.h>
 
 #include <kernaux/assert.h>
 #include <kernaux/drivers/console.h>
@@ -50,50 +48,8 @@ void main(
     kernaux_libc.malloc  = my_malloc;
     kernaux_libc.realloc = my_realloc;
 
-    {
-        char *const hello = malloc(100);
-        strcpy(hello, "Hello, World! The allocator works!\n");
-        kernaux_drivers_console_print(hello);
-        free(hello);
-    }
-
     ASSERT(mrb = mrb_open());
-
-    {
-        mrb_value hello = mrb_str_new_lit(mrb, "Hello, World! Ruby works!\n");
-        kernaux_drivers_console_print(RSTRING_CSTR(mrb, hello));
-    }
-
-    {
-        const char *const source =
-            "begin                                                \n"
-            "   hello = 'Hello, World'                            \n"
-            "   works = 'Ruby eval works'                         \n"
-            "   s = [hello, works].map { |s| \"#{s}!\" }.join ' ' \n"
-            "   \"#{s}\\n\"                                       \n"
-            "end                                                  \n";
-
-        mrb_value program = mrb_str_new_cstr(mrb, source);
-        mrb_value hello =
-            mrb_funcall_id(mrb, mrb_nil_value(), MRB_SYM(eval), 1, program);
-        kernaux_drivers_console_print(RSTRING_CSTR(mrb, hello));
-    }
-
     ASSERT(context = mrbc_context_new(mrb));
-
-    {
-        const char *cmdline = "";
-
-        const struct KernAux_Multiboot2_ITag_BootCmdLine *const cmdline_tag =
-            KernAux_Multiboot2_Info_first_tag_with_type(
-                multiboot2_info,
-                KERNAUX_MULTIBOOT2_ITAG_BOOT_CMD_LINE
-            );
-
-        if (cmdline_tag) cmdline = KERNAUX_MULTIBOOT2_DATA(cmdline_tag);
-
-        kernaux_drivers_console_printf("cmdline: %s\n", cmdline);
-    }
 
     for (
         const struct KernAux_Multiboot2_ITag_Module *module_tag =
