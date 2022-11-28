@@ -4,12 +4,9 @@ DEST_DIR = File.join(ROOT_DIR, 'dest').freeze
 MRuby::CrossBuild.new 'mrubyvisor' do |conf|
   conf.toolchain :gcc
 
-  conf.disable_presym
-
   conf.cc.defines   <<
     'MRB_NO_BOXING' <<
     'MRB_NO_FLOAT'  <<
-    'MRB_NO_PRESYM' <<
     'MRB_NO_STDIO'
 
   conf.cc.flags      <<
