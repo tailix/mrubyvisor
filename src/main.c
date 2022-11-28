@@ -120,12 +120,6 @@ bool load_module(
     const size_t size,
     const char *const cmdline
 ) {
-    kernaux_drivers_console_puts("========================================");
-    kernaux_drivers_console_printf("module cmdline: %s\n", cmdline);
-    kernaux_drivers_console_puts("----------------------------------------");
-    kernaux_drivers_console_write(source, size);
-    if (source[size - 1] != '\n') kernaux_drivers_console_putc('\n');
-
     const int arena = mrb_gc_arena_save(mrb);
     const bool status =
         !mrb_undef_p(mrb_load_nstring_cxt(mrb, source, size, context));
