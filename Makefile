@@ -48,7 +48,8 @@ runc: $(IMAGE)
 runw: $(IMAGE)
 	$(QEMU) -cdrom $< -serial stdio
 
-clean: clean-src clean-dest clean-mruby clean-libkernaux
+clean:      clean-src clean-dest clean-mruby clean-libkernaux
+clean-most: clean-src clean-dest clean-mruby
 
 clean-src:
 	$(MAKE) -C $(SRC) clean
