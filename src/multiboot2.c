@@ -2,6 +2,23 @@
 
 #include <kernaux/multiboot2.h>
 
+// TODO: move these macros to libkernaux
+
+#define HFIELDS_INFO_REQ_ODD(whole_name, htag_name, data_name, align_name, \
+                             mbi_tag_types_count)                          \
+    struct {                                              \
+        struct KernAux_Multiboot2_HTag_InfoReq htag_name; \
+        uint32_t data_name[mbi_tag_types_count];          \
+    } KERNAUX_PACKED whole_name;                          \
+    uint8_t align_name[4];
+
+#define HFIELDS_INFO_REQ_EVEN(whole_name, htag_name, data_name, align_name, \
+                              mbi_tag_types_count)                          \
+    struct {                                              \
+        struct KernAux_Multiboot2_HTag_InfoReq htag_name; \
+        uint32_t data_name[mbi_tag_types_count];          \
+    } KERNAUX_PACKED whole_name;
+
 #include <kernaux/macro/packing_start.run>
 
 __attribute__((
@@ -11,13 +28,7 @@ __attribute__((
 ))
 const struct {
     struct KernAux_Multiboot2_Header header;
-
-    struct {
-        struct KernAux_Multiboot2_HTag_InfoReq tag;
-        uint32_t mbi_tag_types[1];
-    } KERNAUX_PACKED tag_info_req;
-    uint8_t _align1[4];
-
+    HFIELDS_INFO_REQ_ODD(tag_info_req, tag, mbi_tag_types, _align1, 1)
     struct KernAux_Multiboot2_HTag_None tag_none;
 }
 KERNAUX_PACKED
