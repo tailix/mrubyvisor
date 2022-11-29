@@ -105,7 +105,10 @@ void load_elf_symbols(
     }
 
     const struct SectionEntry *const section_headers =
-        (const struct SectionEntry*)KERNAUX_MULTIBOOT2_DATA(elf_symbols_tag);
+        // FIXME: GRUB 2 doesn't conform the spec!
+        // https://www.mail-archive.com/grub-devel@gnu.org/msg30790.html
+        // (const struct SectionEntry*)KERNAUX_MULTIBOOT2_DATA(elf_symbols_tag);
+        (const struct SectionEntry*)(&((uint8_t*)elf_symbols_tag)[20]);
 
     kernaux_drivers_console_puts("ELF symbols tag:");
     KernAux_Multiboot2_ITag_ELFSymbols_print(
@@ -113,6 +116,27 @@ void load_elf_symbols(
         kernaux_drivers_console_printf
     );
     kernaux_drivers_console_printf("  data: 0x%p\n", (void*)section_headers);
+    kernaux_drivers_console_putc('\n');
+
+    const struct SectionEntry *const shstrtab =
+        // FIXME: GRUB 2 doesn't conform the spec!
+        // https://www.mail-archive.com/grub-devel@gnu.org/msg30790.html
+        // &section_headers[elf_symbols_tag->shndx];
+        &section_headers[(uint32_t)(((uint8_t*)elf_symbols_tag)[16])];
+
+    if (shstrtab == section_headers) return;
+
+    for (size_t index = 0; index < elf_symbols_tag->num; ++index) {
+        const struct SectionEntry *const section_header =
+            &section_headers[index];
+
+        kernaux_drivers_console_printf(
+            "section %lu: %s\n",
+            index,
+            &((const char*)shstrtab->vaddr)[section_header->name]
+        );
+    }
+
     kernaux_drivers_console_putc('\n');
 }
 
