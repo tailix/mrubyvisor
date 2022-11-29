@@ -4,6 +4,11 @@
 
 // TODO: move these macros to libkernaux
 
+#define HFIELDS_COMMON(whole_name, htag_name, type) \
+    struct {                                             \
+        struct KernAux_Multiboot2_HTag_##type htag_name; \
+    } KERNAUX_PACKED whole_name;
+
 #define HFIELDS_INFO_REQ_ODD(whole_name, htag_name, data_name, align_name, \
                              mbi_tag_types_count)                          \
     struct {                                              \
@@ -29,7 +34,7 @@ __attribute__((
 const struct {
     struct KernAux_Multiboot2_Header header;
     HFIELDS_INFO_REQ_ODD(tag_info_req, tag, mbi_tag_types, _align1, 1)
-    struct { struct KernAux_Multiboot2_HTag_None tag; } KERNAUX_PACKED tag_none;
+    HFIELDS_COMMON      (tag_none,     tag, None)
 }
 KERNAUX_PACKED
 multiboot2 = {
