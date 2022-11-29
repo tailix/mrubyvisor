@@ -20,7 +20,7 @@ CPPFLAGS =        \
 	$(MRUBY_FLAGS)  \
 	-DKERNAUX_DEBUG \
 
-OBJS = start.S.o main.c.o libc.c.o logger.c.o
+OBJS = start.S.o main.c.o libc.c.o logger.c.o panic.c.o
 
 all: $(MRUBYVISOR)
 

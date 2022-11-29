@@ -1,13 +1,12 @@
 #include "libc.h"
 #include "logger.h"
+#include "panic.h"
 
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
-#include <kernaux/assert.h>
 #include <kernaux/drivers/console.h>
-#include <kernaux/drivers/shutdown.h>
 #include <kernaux/multiboot2.h>
 
 #include <mruby.h>
@@ -15,13 +14,8 @@
 #include <mruby/proc.h>
 #include <mruby/string.h>
 
-#define PANIC(msg) (assert(__FILE__, __LINE__, msg))
-#define ASSERT(cond) ((cond) ? (void)0 : PANIC(#cond))
-
 static mrb_state *mrb = NULL;
 static mrbc_context *context = NULL;
-
-static void assert(const char *file, int line, const char *str);
 
 static bool load_module(const char *source, size_t size, const char *cmdline);
 
@@ -31,12 +25,10 @@ void main(
     const uint32_t multiboot2_info_magic,
     const struct KernAux_Multiboot2_Info *const multiboot2_info
 ) {
-    kernaux_assert_cb = assert;
-
-    ASSERT(multiboot2_info_magic == KERNAUX_MULTIBOOT2_INFO_MAGIC);
-
+    panic_init();
     libc_init();
 
+    ASSERT(multiboot2_info_magic == KERNAUX_MULTIBOOT2_INFO_MAGIC);
     ASSERT(mrb = mrb_open());
     ASSERT(context = mrbc_context_new(mrb));
 
@@ -72,12 +64,6 @@ void main(
         const size_t size = module_tag->mod_end - module_tag->mod_start;
         load_module(source, size, cmdline);
     }
-}
-
-void assert(const char *const file, const int line, const char *const str)
-{
-    logger_assert(file, line, str);
-    kernaux_drivers_shutdown_poweroff();
 }
 
 bool load_module(
