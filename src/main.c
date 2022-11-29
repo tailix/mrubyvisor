@@ -126,18 +126,44 @@ void load_elf_symbols(
 
     if (shstrtab == section_headers) return;
 
+    size_t debug_info_index   = 0;
+    size_t debug_abbrev_index = 0;
+    size_t debug_str_index    = 0;
+
     for (size_t index = 0; index < elf_symbols_tag->num; ++index) {
         const struct SectionEntry *const section_header =
             &section_headers[index];
 
-        kernaux_drivers_console_printf(
-            "section %lu: %s\n",
-            index,
-            &((const char*)shstrtab->vaddr)[section_header->name]
-        );
+        const char *const section_name =
+            &((const char*)shstrtab->vaddr)[section_header->name];
+
+        kernaux_drivers_console_printf("section %lu: %s\n",
+                                       index, section_name);
+
+        if (strcmp(section_name, ".debug_info") == 0) {
+            debug_info_index = index;
+        } else if (strcmp(section_name, ".debug_abbrev") == 0) {
+            debug_abbrev_index = index;
+        } else if (strcmp(section_name, ".debug_str") == 0) {
+            debug_str_index = index;
+        }
     }
 
     kernaux_drivers_console_putc('\n');
+
+    kernaux_drivers_console_printf(".debug_info:   %lu\n", debug_info_index);
+    kernaux_drivers_console_printf(".debug_abbrev: %lu\n", debug_abbrev_index);
+    kernaux_drivers_console_printf(".debug_str:    %lu\n", debug_str_index);
+    kernaux_drivers_console_putc('\n');
+
+    if (!debug_info_index || !debug_abbrev_index || !debug_str_index) return;
+
+    const struct SectionEntry *const debug_info =
+        &section_headers[debug_info_index];
+    const struct SectionEntry *const debug_abbrev =
+        &section_headers[debug_abbrev_index];
+    const struct SectionEntry *const debug_str =
+        &section_headers[debug_str_index];
 }
 
 bool load_module(
