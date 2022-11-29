@@ -29,6 +29,7 @@ void main(
     libc_init();
 
     ASSERT(multiboot2_info_magic == KERNAUX_MULTIBOOT2_INFO_MAGIC);
+    ASSERT(KernAux_Multiboot2_Info_is_valid(multiboot2_info));
     ASSERT(mrb = mrb_open());
     ASSERT(context = mrbc_context_new(mrb));
 
