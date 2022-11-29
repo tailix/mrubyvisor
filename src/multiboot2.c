@@ -37,14 +37,14 @@ const struct {
     HFIELDS_COMMON      (tag_none,     tag, None)
 }
 KERNAUX_PACKED
-multiboot2 = {
+multiboot2_header = {
     .header = {
         .magic = KERNAUX_MULTIBOOT2_HEADER_MAGIC,
         .arch = KERNAUX_MULTIBOOT2_HEADER_ARCH_I386,
-        .total_size = sizeof(multiboot2),
+        .total_size = sizeof(multiboot2_header),
         .checksum = KERNAUX_MULTIBOOT2_HEADER_CHECKSUM(
             KERNAUX_MULTIBOOT2_HEADER_ARCH_I386,
-            sizeof(multiboot2)
+            sizeof(multiboot2_header)
         ),
     },
     .tag_info_req = {
@@ -52,7 +52,7 @@ multiboot2 = {
             .base = {
                 .type = KERNAUX_MULTIBOOT2_HTAG_INFO_REQ,
                 .flags = KERNAUX_MULTIBOOT2_HTAG_BASE_FLAG_OPTIONAL,
-                .size = sizeof(multiboot2.tag_info_req),
+                .size = sizeof(multiboot2_header.tag_info_req),
             },
         },
         .mbi_tag_types = {
@@ -64,7 +64,7 @@ multiboot2 = {
             .base = {
                 .type = KERNAUX_MULTIBOOT2_HTAG_NONE,
                 .flags = 0,
-                .size = sizeof(multiboot2.tag_none),
+                .size = sizeof(multiboot2_header.tag_none),
             },
         },
     },
