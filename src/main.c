@@ -90,7 +90,7 @@ bool load_module(
         !mrb_undef_p(mrb_load_nstring_cxt(mrb, source, size, context));
     struct REnv *const env = mrb_vm_ci_env(mrb->c->cibase);
     mrb_vm_ci_env_set(mrb->c->cibase, NULL);
-    mrb_env_unshare(mrb, env, FALSE);
+    mrb_env_unshare(mrb, env);
     mrbc_cleanup_local_variables(mrb, context);
     mrb_gc_arena_restore(mrb, arena);
     return status;
