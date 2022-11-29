@@ -29,7 +29,7 @@ __attribute__((
 const struct {
     struct KernAux_Multiboot2_Header header;
     HFIELDS_INFO_REQ_ODD(tag_info_req, tag, mbi_tag_types, _align1, 1)
-    struct KernAux_Multiboot2_HTag_None tag_none;
+    struct { struct KernAux_Multiboot2_HTag_None tag; } KERNAUX_PACKED tag_none;
 }
 KERNAUX_PACKED
 multiboot2 = {
@@ -55,10 +55,12 @@ multiboot2 = {
         },
     },
     .tag_none = {
-        .base = {
-            .type = KERNAUX_MULTIBOOT2_HTAG_NONE,
-            .flags = 0,
-            .size = sizeof(multiboot2.tag_none),
+        .tag = {
+            .base = {
+                .type = KERNAUX_MULTIBOOT2_HTAG_NONE,
+                .flags = 0,
+                .size = sizeof(multiboot2.tag_none),
+            },
         },
     },
 };
