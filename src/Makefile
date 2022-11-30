@@ -20,7 +20,14 @@ CPPFLAGS =        \
 	$(MRUBY_FLAGS)  \
 	-DKERNAUX_DEBUG \
 
-OBJS = multiboot2.c.o start.S.o main.c.o libc.c.o logger.c.o panic.c.o
+OBJS =            \
+	libc.c.o        \
+	logger.c.o      \
+	main.c.o        \
+	multiboot2.c.o  \
+	panic.c.o       \
+	stack_trace.c.o \
+	start.S.o
 
 all: $(MRUBYVISOR)
 
