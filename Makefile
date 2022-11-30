@@ -4,14 +4,19 @@
 
 CCPREFIX = /home/kotovalexarian/repos/global/tailix/cross/root/bin/i386-elf-
 
+# Toolchain
 AR     = $(CCPREFIX)ar
 AS     = $(CCPREFIX)as
 CC     = $(CCPREFIX)gcc
 LD     = $(CCPREFIX)ld
 RANLIB = $(CCPREFIX)ranlib
 
+# Common programs
+MKDIR = mkdir
+PWD   = pwd
+
+# Additional programs
 GRUB_MKRESCUE = grub-mkrescue
-MKDIR         = mkdir
 RAKE          = rake
 QEMU          = qemu-system-i386
 
@@ -19,7 +24,7 @@ QEMU          = qemu-system-i386
 # Pathes #
 ##########
 
-ABS_REPO = $(shell pwd)
+ABS_REPO = $(shell $(PWD))
 
 # Basic paths
 MRUBY_CONF     = build_config.rb
@@ -54,12 +59,11 @@ LIBKERNAUX_ARGS =       \
 # mruby #
 #########
 
+MRUBY_BUILD_NAME = mrubyvisor
 MRUBY_FLAGS =     \
 	-DMRB_NO_BOXING \
 	-DMRB_NO_FLOAT  \
 	-DMRB_NO_STDIO
-
-MRUBY_BUILD_NAME = mrubyvisor
 
 #########
 # Tasks #
