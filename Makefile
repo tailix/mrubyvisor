@@ -1,3 +1,7 @@
+############
+# Programs #
+############
+
 CCPREFIX = /home/kotovalexarian/repos/global/tailix/cross/root/bin/i386-elf-
 
 AR     = $(CCPREFIX)ar
@@ -7,8 +11,13 @@ LD     = $(CCPREFIX)ld
 RANLIB = $(CCPREFIX)ranlib
 
 GRUB_MKRESCUE = grub-mkrescue
+MKDIR         = mkdir
 RAKE          = rake
 QEMU          = qemu-system-i386
+
+##########
+# Pathes #
+##########
 
 ABS_REPO = $(shell pwd)
 
@@ -29,6 +38,10 @@ LIBMRUBY    = $(LIB_DIR)/libmruby.a
 GRUBCFG     = $(ROOTFS_DIR)/boot/grub/grub.cfg
 MRUBYVISOR  = $(ROOTFS_DIR)/boot/mrubyvisor.multiboot2
 
+##############
+# libkernaux #
+##############
+
 LIBKERNAUX_ARGS =       \
 	--enable-freestanding \
 	--enable-split-libc   \
@@ -37,12 +50,20 @@ LIBKERNAUX_ARGS =       \
 	--with-drivers        \
 	--with-libc
 
+#########
+# mruby #
+#########
+
 MRUBY_FLAGS =     \
 	-DMRB_NO_BOXING \
 	-DMRB_NO_FLOAT  \
 	-DMRB_NO_STDIO
 
 MRUBY_BUILD_NAME = mrubyvisor
+
+#########
+# Tasks #
+#########
 
 .PHONY: $(IMAGE) $(MRUBYVISOR)
 
@@ -69,6 +90,10 @@ clean-mruby:
 clean-libkernaux:
 	$(MAKE) -C $(LIBKERNAUX_DIR) distclean || true
 
+##############
+# File tasks #
+##############
+
 $(IMAGE): $(GRUBCFG) $(MRUBYVISOR)
 	$(GRUB_MKRESCUE) $(ROOTFS_DIR) -o $@
 
@@ -84,7 +109,7 @@ $(LIBKERNAUX):
 
 $(LIBMRUBY): $(LIBKERNAUX) $(MRUBY_CONF)
 	$(MAKE) clean-mruby
-	mkdir -p $(INCLUDE_DIR) $(LIB_DIR)
+	$(MKDIR) -p $(INCLUDE_DIR) $(LIB_DIR)
 	cd $(MRUBY_DIR) && $(RAKE) MRUBY_CONFIG='$(ABS_REPO)/$(MRUBY_CONF)' CROSS_AR='$(AR)' CROSS_CC='$(CC)' CROSS_LD='$(LD)' FLAGS='$(MRUBY_FLAGS)' BUILD_NAME='$(MRUBY_BUILD_NAME)' INCLUDE_DIR='$(ABS_REPO)/$(INCLUDE_DIR)' LIB_DIR='$(ABS_REPO)/$(LIB_DIR)'
 	cp -r $(MRUBY_DIR)/include/*                                $(INCLUDE_DIR)
 	cp -r $(MRUBY_DIR)/build/$(MRUBY_BUILD_NAME)/include/*      $(INCLUDE_DIR)
