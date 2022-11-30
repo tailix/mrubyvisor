@@ -12,6 +12,7 @@ LD     = $(CCPREFIX)ld
 RANLIB = $(CCPREFIX)ranlib
 
 # Common programs
+CP    = cp
 MKDIR = mkdir
 PWD   = pwd
 
@@ -20,9 +21,9 @@ GRUB_MKRESCUE = grub-mkrescue
 RAKE          = rake
 QEMU          = qemu-system-i386
 
-##########
-# Pathes #
-##########
+#########
+# Paths #
+#########
 
 ABS_REPO = $(shell $(PWD))
 
@@ -79,8 +80,7 @@ runc: $(IMAGE)
 runw: $(IMAGE)
 	$(QEMU) -cdrom $< -serial stdio
 
-clean:      clean-src clean-dest clean-mruby clean-libkernaux
-clean-most: clean-src clean-dest clean-mruby
+clean: clean-src clean-dest clean-mruby clean-libkernaux
 
 clean-src:
 	$(MAKE) -C $(SRC_DIR) clean
@@ -103,7 +103,7 @@ $(IMAGE): $(GRUBCFG) $(MRUBYVISOR)
 
 $(MRUBYVISOR): $(LIBKERNAUX) $(LIBMRUBY)
 	$(MAKE) -C $(SRC_DIR) mrubyvisor.multiboot2 CCPREFIX='$(CCPREFIX)' DEST='$(ABS_REPO)/$(DEST_DIR)' MRUBY_FLAGS='$(MRUBY_FLAGS)'
-	cp $(SRC_DIR)/mrubyvisor.multiboot2 $@
+	$(CP) $(SRC_DIR)/mrubyvisor.multiboot2 $@
 
 $(LIBKERNAUX):
 	cd $(LIBKERNAUX_DIR) && ./autogen.sh
@@ -115,6 +115,6 @@ $(LIBMRUBY): $(LIBKERNAUX) $(MRUBY_CONF)
 	$(MAKE) clean-mruby
 	$(MKDIR) -p $(INCLUDE_DIR) $(LIB_DIR)
 	cd $(MRUBY_DIR) && $(RAKE) MRUBY_CONFIG='$(ABS_REPO)/$(MRUBY_CONF)' CROSS_AR='$(AR)' CROSS_CC='$(CC)' CROSS_LD='$(LD)' FLAGS='$(MRUBY_FLAGS)' BUILD_NAME='$(MRUBY_BUILD_NAME)' INCLUDE_DIR='$(ABS_REPO)/$(INCLUDE_DIR)' LIB_DIR='$(ABS_REPO)/$(LIB_DIR)'
-	cp -r $(MRUBY_DIR)/include/*                                $(INCLUDE_DIR)
-	cp -r $(MRUBY_DIR)/build/$(MRUBY_BUILD_NAME)/include/*      $(INCLUDE_DIR)
-	cp    $(MRUBY_DIR)/build/$(MRUBY_BUILD_NAME)/lib/libmruby.a $(LIB_DIR)
+	$(CP) -r $(MRUBY_DIR)/include/*                                $(INCLUDE_DIR)
+	$(CP) -r $(MRUBY_DIR)/build/$(MRUBY_BUILD_NAME)/include/*      $(INCLUDE_DIR)
+	$(CP)    $(MRUBY_DIR)/build/$(MRUBY_BUILD_NAME)/lib/libmruby.a $(LIB_DIR)
