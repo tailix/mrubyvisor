@@ -4,9 +4,11 @@ AR     = $(CCPREFIX)ar
 AS     = $(CCPREFIX)as
 CC     = $(CCPREFIX)gcc
 LD     = $(CCPREFIX)ld
-RAKE   = rake
 RANLIB = $(CCPREFIX)ranlib
-QEMU   = qemu-system-i386
+
+GRUB_MKRESCUE = grub-mkrescue
+RAKE          = rake
+QEMU          = qemu-system-i386
 
 ABS_REPO = $(shell pwd)
 
@@ -68,7 +70,7 @@ clean-libkernaux:
 	$(MAKE) -C $(LIBKERNAUX_DIR) distclean || true
 
 $(IMAGE): $(GRUBCFG) $(MRUBYVISOR)
-	grub-mkrescue $(ROOTFS_DIR) -o $@
+	$(GRUB_MKRESCUE) $(ROOTFS_DIR) -o $@
 
 $(MRUBYVISOR): $(LIBKERNAUX) $(LIBMRUBY)
 	$(MAKE) -C $(SRC_DIR) mrubyvisor.multiboot2 CCPREFIX='$(CCPREFIX)' DEST='$(ABS_REPO)/$(DEST_DIR)' MRUBY_FLAGS='$(MRUBY_FLAGS)'
