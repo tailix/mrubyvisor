@@ -10,8 +10,7 @@ mrubyvisor
 Dependencies
 ------------
 
-Edit the variable `CCPREFIX` in `Makefile` to point to the
-[cross-compiler for i386](https://wiki.osdev.org/GCC_Cross-Compiler).
+[Cross-compiler](https://wiki.osdev.org/GCC_Cross-Compiler).
 
 ### Debian
 
