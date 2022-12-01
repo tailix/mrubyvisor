@@ -1,4 +1,5 @@
 /build_config.rb.lock
+/config.mk
 /image.iso
 
 /dest/*

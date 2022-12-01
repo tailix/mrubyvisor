@@ -21,3 +21,12 @@ The list may be incomplete.
 * `grub-common`
 * `qemu-system-x86`
 * `rake`
+
+
+
+Build
+-----
+
+Create file `config.mk`, use `config.example.mk` as a reference.
+
+Then just do `make`.
