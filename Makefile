@@ -28,17 +28,21 @@ QEMU          = qemu-system-i386
 ABS_REPO = $(shell $(PWD))
 
 # Basic paths
-MRUBY_CONF     = build_config.rb
-DEST_DIR       = dest
-IMAGE          = image.iso
-ROOTFS_DIR     = rootfs
-SRC_DIR        = src
+MRUBY_CONF = build_config.rb
+DEST_DIR   = dest
+IMAGE      = image.iso
+ROOTFS_DIR = rootfs
+SRC_DIR    = src
+
+# Basic paths (dependencies)
 LIBKERNAUX_DIR = vendor/libkernaux
+DRIVERS_DIR    = vendor/drivers
 MRUBY_DIR      = vendor/mruby
 
 # Deeper paths
 INCLUDE_DIR = $(DEST_DIR)/include
 LIB_DIR     = $(DEST_DIR)/lib
+LIBDRIVERS  = $(LIB_DIR)/libdrivers.a
 LIBKERNAUX  = $(LIB_DIR)/libkernaux.a
 LIBMRUBY    = $(LIB_DIR)/libmruby.a
 GRUBCFG     = $(ROOTFS_DIR)/boot/grub/grub.cfg
@@ -48,7 +52,7 @@ MRUBYVISOR  = $(ROOTFS_DIR)/boot/mrubyvisor.multiboot2
 # libkernaux #
 ##############
 
-LIBKERNAUX_ARGS =       \
+LIBKERNAUX_ARGS = \
 	--enable-freestanding \
 	--enable-split-libc   \
 	--enable-debug        \
@@ -56,12 +60,22 @@ LIBKERNAUX_ARGS =       \
 	--with-drivers        \
 	--with-libc
 
+###########
+# drivers #
+###########
+
+DRIVERS_CFLAGS = \
+	-nostdlib      \
+	-ffreestanding \
+	-fno-pic       \
+	-fno-stack-protector
+
 #########
 # mruby #
 #########
 
 MRUBY_BUILD_NAME = mrubyvisor
-MRUBY_FLAGS =     \
+MRUBY_FLAGS = \
 	-DMRB_NO_BOXING \
 	-DMRB_NO_FLOAT  \
 	-DMRB_NO_STDIO
@@ -91,6 +105,9 @@ clean-dest:
 clean-mruby:
 	cd $(MRUBY_DIR) && $(RAKE) clean
 
+clean-drivers:
+	$(MAKE) -C $(DRIVERS_DIR) distclean || true
+
 clean-libkernaux:
 	$(MAKE) -C $(LIBKERNAUX_DIR) distclean || true
 
@@ -101,7 +118,7 @@ clean-libkernaux:
 $(IMAGE): $(GRUBCFG) $(MRUBYVISOR)
 	$(GRUB_MKRESCUE) $(ROOTFS_DIR) -o $@
 
-$(MRUBYVISOR): $(LIBKERNAUX) $(LIBMRUBY)
+$(MRUBYVISOR): $(LIBKERNAUX) $(LIBDRIVERS) $(LIBMRUBY)
 	$(MAKE) -C $(SRC_DIR) mrubyvisor.multiboot2 CCPREFIX='$(CCPREFIX)' DEST='$(ABS_REPO)/$(DEST_DIR)' MRUBY_FLAGS='$(MRUBY_FLAGS)'
 	$(CP) $(SRC_DIR)/mrubyvisor.multiboot2 $@
 
@@ -110,6 +127,12 @@ $(LIBKERNAUX):
 	cd $(LIBKERNAUX_DIR) && ./configure --host='i386-elf' --prefix='$(ABS_REPO)/$(DEST_DIR)' $(LIBKERNAUX_ARGS) AR='$(AR)' AS='$(AS)' CC='$(CC)' LD='$(LD)' RANLIB='$(RANLIB)'
 	cd $(LIBKERNAUX_DIR) && $(MAKE)
 	cd $(LIBKERNAUX_DIR) && $(MAKE) install
+
+$(LIBDRIVERS):
+	cd $(DRIVERS_DIR) && ./autogen.sh
+	cd $(DRIVERS_DIR) && ./configure --host='i386-elf' --prefix='$(ABS_REPO)/$(DEST_DIR)' CFLAGS='$(DRIVERS_CFLAGS)' AR='$(AR)' AS='$(AS)' CC='$(CC)' LD='$(LD)' RANLIB='$(RANLIB)'
+	cd $(DRIVERS_DIR) && $(MAKE)
+	cd $(DRIVERS_DIR) && $(MAKE) install
 
 $(LIBMRUBY): $(LIBKERNAUX) $(MRUBY_CONF)
 	$(MAKE) clean-mruby
