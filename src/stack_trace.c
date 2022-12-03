@@ -2,7 +2,7 @@
 
 #include <string.h>
 
-#include <kernaux/drivers/console.h>
+#include <drivers/console.h>
 #include <kernaux/multiboot2.h>
 
 #include <kernaux/macro/packing_start.run>
@@ -34,7 +34,7 @@ void stack_trace_init(
         );
 
     if (!elf_symbols_tag) {
-        kernaux_drivers_console_puts("ELF symbols tag not found");
+        drivers_console_puts("ELF symbols tag not found");
         return;
     }
 
@@ -44,13 +44,13 @@ void stack_trace_init(
         // (const struct SectionEntry*)KERNAUX_MULTIBOOT2_DATA(elf_symbols_tag);
         (const struct SectionEntry*)(&((uint8_t*)elf_symbols_tag)[20]);
 
-    kernaux_drivers_console_puts("ELF symbols tag:");
+    drivers_console_puts("ELF symbols tag:");
     KernAux_Multiboot2_ITag_ELFSymbols_print(
         elf_symbols_tag,
-        kernaux_drivers_console_printf
+        drivers_console_printf
     );
-    kernaux_drivers_console_printf("  data: 0x%p\n", (void*)section_headers);
-    kernaux_drivers_console_putc('\n');
+    drivers_console_printf("  data: 0x%p\n", (void*)section_headers);
+    drivers_console_putc('\n');
 
     const struct SectionEntry *const shstrtab =
         // FIXME: GRUB 2 doesn't conform the spec!
@@ -71,8 +71,7 @@ void stack_trace_init(
         const char *const section_name =
             &((const char*)shstrtab->vaddr)[section_header->name];
 
-        kernaux_drivers_console_printf("section %lu: %s\n",
-                                       index, section_name);
+        drivers_console_printf("section %lu: %s\n", index, section_name);
 
         if (strcmp(section_name, ".debug_info") == 0) {
             debug_info_index = index;
@@ -83,12 +82,12 @@ void stack_trace_init(
         }
     }
 
-    kernaux_drivers_console_putc('\n');
+    drivers_console_putc('\n');
 
-    kernaux_drivers_console_printf(".debug_info:   %lu\n", debug_info_index);
-    kernaux_drivers_console_printf(".debug_abbrev: %lu\n", debug_abbrev_index);
-    kernaux_drivers_console_printf(".debug_str:    %lu\n", debug_str_index);
-    kernaux_drivers_console_putc('\n');
+    drivers_console_printf(".debug_info:   %lu\n", debug_info_index);
+    drivers_console_printf(".debug_abbrev: %lu\n", debug_abbrev_index);
+    drivers_console_printf(".debug_str:    %lu\n", debug_str_index);
+    drivers_console_putc('\n');
 
     if (!debug_info_index || !debug_abbrev_index || !debug_str_index) return;
 /*

@@ -7,8 +7,9 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include <kernaux/drivers/console.h>
 #include <kernaux/multiboot2.h>
+
+#include <drivers/console.h>
 
 #include <mruby.h>
 #include <mruby/compile.h>
@@ -93,6 +94,6 @@ mrb_value ruby_console_puts(
 ) {
     const char *str = NULL;
     mrb_get_args(mrb, "z", &str);
-    kernaux_drivers_console_puts(str);
+    drivers_console_puts(str);
     return mrb_nil_value();
 }

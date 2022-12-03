@@ -3,7 +3,7 @@
 
 #include <stdlib.h>
 
-#include <kernaux/drivers/shutdown.h>
+#include <drivers/shutdown.h>
 #include <kernaux/generic/malloc.h>
 #include <kernaux/free_list.h>
 #include <kernaux/libc.h>
@@ -43,7 +43,7 @@ void my_abort()
 void my_exit(const int status)
 {
     logger_exit(status);
-    kernaux_drivers_shutdown_poweroff();
+    drivers_shutdown_poweroff();
 
     // TODO: libkernaux shutdown poweroff noreturn
     volatile int x = 0;
