@@ -4,3 +4,6 @@
 [submodule "vendor/mruby"]
 	path = vendor/mruby
 	url = https://github.com/mruby/mruby.git
+[submodule "vendor/drivers"]
+	path = vendor/drivers
+	url = https://github.com/tailix/drivers.git
