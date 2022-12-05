@@ -57,7 +57,6 @@ LIBKERNAUX_ARGS = \
 	--enable-split-libc   \
 	--enable-debug        \
 	--disable-float       \
-	--with-drivers        \
 	--with-libc
 
 ###########
