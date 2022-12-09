@@ -1,8 +1,11 @@
+#define KERNAUX_ACCESS_PROTECTED
+
 #include "stack_trace.h"
 
 #include <string.h>
 
 #include <drivers/console.h>
+#include <kernaux/generic/display.h>
 #include <kernaux/multiboot2.h>
 
 #include <kernaux/macro/packing_start.run>
@@ -22,6 +25,14 @@ struct SectionEntry {
 KERNAUX_PACKED;
 
 #include <kernaux/macro/packing_end.run>
+
+void my_putc(void *display KERNAUX_UNUSED, char c);
+void my_vprintf(void *display KERNAUX_UNUSED, const char *format, va_list va);
+
+static const struct KernAux_Display display = {
+    .putc = my_putc,
+    .vprintf = my_vprintf,
+};
 
 void stack_trace_init(
     const struct KernAux_Multiboot2_Info *const multiboot2_info
@@ -45,10 +56,7 @@ void stack_trace_init(
         (const struct SectionEntry*)(&((uint8_t*)elf_symbols_tag)[20]);
 
     drivers_console_puts("ELF symbols tag:");
-    KernAux_Multiboot2_ITag_ELFSymbols_print(
-        elf_symbols_tag,
-        drivers_console_printf
-    );
+    KernAux_Multiboot2_ITag_ELFSymbols_print(elf_symbols_tag, &display);
     drivers_console_printf("  data: 0x%p\n", (void*)section_headers);
     drivers_console_putc('\n');
 
@@ -98,4 +106,14 @@ void stack_trace_init(
     const struct SectionEntry *const debug_str =
         &section_headers[debug_str_index];
 */
+}
+
+void my_putc(void *display KERNAUX_UNUSED, char c)
+{
+    drivers_console_putc(c);
+}
+
+void my_vprintf(void *display KERNAUX_UNUSED, const char *format, va_list va)
+{
+    drivers_console_vprintf(format, va);
 }

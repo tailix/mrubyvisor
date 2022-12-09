@@ -56,6 +56,7 @@ LIBKERNAUX_ARGS = \
 	--enable-freestanding \
 	--enable-split-libc   \
 	--enable-debug        \
+	--disable-werror      \
 	--disable-float       \
 	--with-libc
 
