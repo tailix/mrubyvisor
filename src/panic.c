@@ -2,7 +2,7 @@
 #include "panic.h"
 
 #include <drivers/shutdown.h>
-#include <kernaux/assert.h>
+#include <kernaux/runtime.h>
 
 void panic_init()
 {
