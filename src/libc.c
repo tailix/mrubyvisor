@@ -6,7 +6,7 @@
 #include <drivers/shutdown.h>
 #include <kernaux/generic/malloc.h>
 #include <kernaux/free_list.h>
-#include <kernaux/libc.h>
+#include <libclayer.h>
 
 static struct KernAux_FreeList allocator;
 static uint8_t memory[1024 * 128]; // 128 KiB
@@ -26,13 +26,13 @@ void libc_init()
     KernAux_FreeList_init(&allocator, NULL);
     KernAux_FreeList_add_zone(&allocator, memory, sizeof(memory));
 
-    kernaux_libc.abort   = my_abort;
-    kernaux_libc.exit    = my_exit;
+    libclayer.abort   = my_abort;
+    libclayer.exit    = my_exit;
 
-    kernaux_libc.calloc  = my_calloc;
-    kernaux_libc.free    = my_free;
-    kernaux_libc.malloc  = my_malloc;
-    kernaux_libc.realloc = my_realloc;
+    libclayer.calloc  = my_calloc;
+    libclayer.free    = my_free;
+    libclayer.malloc  = my_malloc;
+    libclayer.realloc = my_realloc;
 }
 
 void my_abort()

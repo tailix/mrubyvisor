@@ -7,3 +7,6 @@
 [submodule "vendor/drivers"]
 	path = vendor/drivers
 	url = https://github.com/tailix/drivers.git
+[submodule "vendor/libclayer"]
+	path = vendor/libclayer
+	url = https://github.com/tailix/libclayer.git

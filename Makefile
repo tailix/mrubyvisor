@@ -35,6 +35,7 @@ ROOTFS_DIR = rootfs
 SRC_DIR    = src
 
 # Basic paths (dependencies)
+LIBCLAYER_DIR  = vendor/libclayer
 LIBKERNAUX_DIR = vendor/libkernaux
 DRIVERS_DIR    = vendor/drivers
 MRUBY_DIR      = vendor/mruby
@@ -42,11 +43,21 @@ MRUBY_DIR      = vendor/mruby
 # Deeper paths
 INCLUDE_DIR = $(DEST_DIR)/include
 LIB_DIR     = $(DEST_DIR)/lib
+LIBCLAYER   = $(LIB_DIR)/libc.a
 LIBDRIVERS  = $(LIB_DIR)/libdrivers.a
 LIBKERNAUX  = $(LIB_DIR)/libkernaux.a
 LIBMRUBY    = $(LIB_DIR)/libmruby.a
 GRUBCFG     = $(ROOTFS_DIR)/boot/grub/grub.cfg
 MRUBYVISOR  = $(ROOTFS_DIR)/boot/mrubyvisor.multiboot2
+
+#############
+# libclayer #
+#############
+
+LIBCLAYER_ARGS = \
+	--enable-libc       \
+	--disable-libclayer \
+	--enable-freestanding
 
 ##############
 # libkernaux #
@@ -57,7 +68,7 @@ LIBKERNAUX_ARGS = \
 	--enable-split-libc   \
 	--enable-debug        \
 	--disable-float       \
-	--with-libc
+	CFLAGS='-I$(ABS_REPO)/$(INCLUDE_DIR)'
 
 ###########
 # drivers #
@@ -93,7 +104,7 @@ runc: $(IMAGE)
 runw: $(IMAGE)
 	$(QEMU) -cdrom $< -serial stdio
 
-clean: clean-src clean-dest clean-mruby clean-libkernaux
+clean: clean-src clean-dest clean-mruby clean-libkernaux clean-libclayer
 
 clean-src:
 	$(MAKE) -C $(SRC_DIR) clean
@@ -110,6 +121,9 @@ clean-drivers:
 clean-libkernaux:
 	$(MAKE) -C $(LIBKERNAUX_DIR) distclean || true
 
+clean-libclayer:
+	$(MAKE) -C $(LIBCLAYER_DIR) distclean || true
+
 ##############
 # File tasks #
 ##############
@@ -117,11 +131,17 @@ clean-libkernaux:
 $(IMAGE): $(GRUBCFG) $(MRUBYVISOR)
 	$(GRUB_MKRESCUE) $(ROOTFS_DIR) -o $@
 
-$(MRUBYVISOR): $(LIBKERNAUX) $(LIBDRIVERS) $(LIBMRUBY)
+$(MRUBYVISOR): $(LIBCLAYER) $(LIBKERNAUX) $(LIBDRIVERS) $(LIBMRUBY)
 	$(MAKE) -C $(SRC_DIR) mrubyvisor.multiboot2 CCPREFIX='$(CCPREFIX)' DEST='$(ABS_REPO)/$(DEST_DIR)' MRUBY_FLAGS='$(MRUBY_FLAGS)'
 	$(CP) $(SRC_DIR)/mrubyvisor.multiboot2 $@
 
-$(LIBKERNAUX):
+$(LIBCLAYER):
+	cd $(LIBCLAYER_DIR) && ./autogen.sh
+	cd $(LIBCLAYER_DIR) && ./configure --host='i386-elf' --prefix='$(ABS_REPO)/$(DEST_DIR)' $(LIBCLAYER_ARGS) AR='$(AR)' AS='$(AS)' CC='$(CC)' LD='$(LD)' RANLIB='$(RANLIB)'
+	cd $(LIBCLAYER_DIR) && $(MAKE)
+	cd $(LIBCLAYER_DIR) && $(MAKE) install
+
+$(LIBKERNAUX): $(LIBCLAYER)
 	cd $(LIBKERNAUX_DIR) && ./autogen.sh
 	cd $(LIBKERNAUX_DIR) && ./configure --host='i386-elf' --prefix='$(ABS_REPO)/$(DEST_DIR)' $(LIBKERNAUX_ARGS) AR='$(AR)' AS='$(AS)' CC='$(CC)' LD='$(LD)' RANLIB='$(RANLIB)'
 	cd $(LIBKERNAUX_DIR) && $(MAKE)
