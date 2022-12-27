@@ -59,6 +59,13 @@ LIBCLAYER_ARGS = \
 	--disable-libclayer \
 	--enable-freestanding
 
+LIBCLAYER_VARS = \
+	AR='$(AR)' \
+	AS='$(AS)' \
+	CC='$(CC)' \
+	LD='$(LD)' \
+	RANLIB='$(RANLIB)'
+
 ##############
 # libkernaux #
 ##############
@@ -67,7 +74,14 @@ LIBKERNAUX_ARGS = \
 	--enable-freestanding \
 	--enable-split-libc   \
 	--enable-debug        \
-	--disable-float       \
+	--disable-float
+
+LIBKERNAUX_VARS = \
+	AR='$(AR)'         \
+	AS='$(AS)'         \
+	CC='$(CC)'         \
+	LD='$(LD)'         \
+	RANLIB='$(RANLIB)' \
 	CFLAGS='-I$(ABS_REPO)/$(INCLUDE_DIR)'
 
 ###########
@@ -80,6 +94,14 @@ DRIVERS_CFLAGS = \
 	-fno-pic       \
 	-fno-stack-protector
 
+DRIVERS_VARS = \
+	AR='$(AR)'         \
+	AS='$(AS)'         \
+	CC='$(CC)'         \
+	LD='$(LD)'         \
+	RANLIB='$(RANLIB)' \
+	CFLAGS='$(DRIVERS_CFLAGS)'
+
 #########
 # mruby #
 #########
@@ -89,6 +111,16 @@ MRUBY_FLAGS = \
 	-DMRB_NO_BOXING \
 	-DMRB_NO_FLOAT  \
 	-DMRB_NO_STDIO
+
+MRUBY_VARS = \
+	MRUBY_CONFIG='$(ABS_REPO)/$(MRUBY_CONF)' \
+	CROSS_AR='$(AR)' \
+	CROSS_CC='$(CC)' \
+	CROSS_LD='$(LD)' \
+	FLAGS='$(MRUBY_FLAGS)' \
+	BUILD_NAME='$(MRUBY_BUILD_NAME)' \
+	INCLUDE_DIR='$(ABS_REPO)/$(INCLUDE_DIR)' \
+	LIB_DIR='$(ABS_REPO)/$(LIB_DIR)'
 
 #########
 # Tasks #
@@ -137,26 +169,26 @@ $(MRUBYVISOR): $(LIBCLAYER) $(LIBKERNAUX) $(LIBDRIVERS) $(LIBMRUBY)
 
 $(LIBCLAYER):
 	cd $(LIBCLAYER_DIR) && ./autogen.sh
-	cd $(LIBCLAYER_DIR) && ./configure --host='i386-elf' --prefix='$(ABS_REPO)/$(DEST_DIR)' $(LIBCLAYER_ARGS) AR='$(AR)' AS='$(AS)' CC='$(CC)' LD='$(LD)' RANLIB='$(RANLIB)'
+	cd $(LIBCLAYER_DIR) && ./configure --host='i386-elf' --prefix='$(ABS_REPO)/$(DEST_DIR)' $(LIBCLAYER_ARGS) $(LIBCLAYER_VARS)
 	cd $(LIBCLAYER_DIR) && $(MAKE)
 	cd $(LIBCLAYER_DIR) && $(MAKE) install
 
 $(LIBKERNAUX): $(LIBCLAYER)
 	cd $(LIBKERNAUX_DIR) && ./autogen.sh
-	cd $(LIBKERNAUX_DIR) && ./configure --host='i386-elf' --prefix='$(ABS_REPO)/$(DEST_DIR)' $(LIBKERNAUX_ARGS) AR='$(AR)' AS='$(AS)' CC='$(CC)' LD='$(LD)' RANLIB='$(RANLIB)'
+	cd $(LIBKERNAUX_DIR) && ./configure --host='i386-elf' --prefix='$(ABS_REPO)/$(DEST_DIR)' $(LIBKERNAUX_ARGS) $(LIBKERNAUX_VARS)
 	cd $(LIBKERNAUX_DIR) && $(MAKE)
 	cd $(LIBKERNAUX_DIR) && $(MAKE) install
 
 $(LIBDRIVERS):
 	cd $(DRIVERS_DIR) && ./autogen.sh
-	cd $(DRIVERS_DIR) && ./configure --host='i386-elf' --prefix='$(ABS_REPO)/$(DEST_DIR)' CFLAGS='$(DRIVERS_CFLAGS)' AR='$(AR)' AS='$(AS)' CC='$(CC)' LD='$(LD)' RANLIB='$(RANLIB)'
+	cd $(DRIVERS_DIR) && ./configure --host='i386-elf' --prefix='$(ABS_REPO)/$(DEST_DIR)' $(DRIVERS_VARS)
 	cd $(DRIVERS_DIR) && $(MAKE)
 	cd $(DRIVERS_DIR) && $(MAKE) install
 
 $(LIBMRUBY): $(LIBKERNAUX) $(MRUBY_CONF)
 	$(MAKE) clean-mruby
 	$(MKDIR) -p $(INCLUDE_DIR) $(LIB_DIR)
-	cd $(MRUBY_DIR) && $(RAKE) MRUBY_CONFIG='$(ABS_REPO)/$(MRUBY_CONF)' CROSS_AR='$(AR)' CROSS_CC='$(CC)' CROSS_LD='$(LD)' FLAGS='$(MRUBY_FLAGS)' BUILD_NAME='$(MRUBY_BUILD_NAME)' INCLUDE_DIR='$(ABS_REPO)/$(INCLUDE_DIR)' LIB_DIR='$(ABS_REPO)/$(LIB_DIR)'
+	cd $(MRUBY_DIR) && $(RAKE) $(MRUBY_VARS)
 	$(CP) -r $(MRUBY_DIR)/include/*                                $(INCLUDE_DIR)
 	$(CP) -r $(MRUBY_DIR)/build/$(MRUBY_BUILD_NAME)/include/*      $(INCLUDE_DIR)
 	$(CP)    $(MRUBY_DIR)/build/$(MRUBY_BUILD_NAME)/lib/libmruby.a $(LIB_DIR)
